@@ -8,14 +8,10 @@ class Item extends HiveObject {
   String name;
 
   @HiveField(1)
-  String category;
-
-  @HiveField(2)
   bool isSelected;
 
   Item({
     required this.name,
-    required this.category,
     this.isSelected = false,
   });
 }

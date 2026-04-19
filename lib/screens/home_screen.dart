@@ -15,33 +15,66 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     box = Hive.box<Item>('itemsBox');
-    seedData();
   }
 
-  void seedData() {
-    if (box.isEmpty) {
-      final categories = ['A', 'B', 'C'];
-
-      for (int i = 1; i <= 100; i++) {
-        box.add(Item(
-          name: "Item $i",
-          category: categories[i % 3],
-        ));
-      }
+  void addItem(String name) {
+    if (box.length >= 100) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Limit reached (100 items)")),
+      );
+      return;
     }
+
+    if (name.trim().isEmpty) return;
+
+    box.add(Item(name: name.trim()));
+  }
+
+  void showAddDialog() {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: Text("Add Item"),
+          content: TextField(
+            controller: controller,
+            decoration: InputDecoration(hintText: "Enter item name"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text("Cancel"),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                addItem(controller.text);
+                Navigator.pop(context);
+              },
+              child: Text("Add"),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Pro Item Selector"),
+        title: Text("Item Selector (Max 100)"),
       ),
 
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (context, Box<Item> box, _) {
           final items = box.values.toList();
+
+          if (items.isEmpty) {
+            return Center(child: Text("No items yet. Add some!"));
+          }
 
           return ListView.builder(
             itemCount: items.length,
@@ -50,15 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
               return ListTile(
                 title: Text(item.name),
-                subtitle: Text("Category ${item.category}"),
-
                 trailing: Icon(
-                  item.isSelected
-                      ? Icons.check_circle
-                      : Icons.circle_outlined,
+                  item.isSelected ? Icons.check_circle : Icons.circle_outlined,
                   color: item.isSelected ? Colors.green : null,
                 ),
-
                 onTap: () {
                   item.isSelected = !item.isSelected;
                   item.save();
@@ -69,15 +97,28 @@ class _HomeScreenState extends State<HomeScreen> {
         },
       ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        icon: Icon(Icons.shopping_cart),
-        label: Text("Selected"),
-        onPressed: () {
-          showModalBottomSheet(
-            context: context,
-            builder: (_) => SelectedSheet(),
-          );
-        },
+      // ➕ Add item
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          FloatingActionButton(
+            heroTag: "add",
+            child: Icon(Icons.add),
+            onPressed: showAddDialog,
+          ),
+          SizedBox(height: 10),
+          FloatingActionButton.extended(
+            heroTag: "selected",
+            icon: Icon(Icons.shopping_cart),
+            label: Text("Selected"),
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (_) => SelectedSheet(),
+              );
+            },
+          ),
+        ],
       ),
     );
   }

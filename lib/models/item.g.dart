@@ -18,20 +18,17 @@ class ItemAdapter extends TypeAdapter<Item> {
     };
     return Item(
       name: fields[0] as String,
-      category: fields[1] as String,
-      isSelected: fields[2] as bool,
+      isSelected: fields[1] as bool,
     );
   }
 
   @override
   void write(BinaryWriter writer, Item obj) {
     writer
-      ..writeByte(3)
+      ..writeByte(2)
       ..writeByte(0)
       ..write(obj.name)
       ..writeByte(1)
-      ..write(obj.category)
-      ..writeByte(2)
       ..write(obj.isSelected);
   }
 

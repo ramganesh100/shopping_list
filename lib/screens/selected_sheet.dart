@@ -12,8 +12,7 @@ class SelectedSheet extends StatelessWidget {
       child: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (_, Box<Item> box, __) {
-          final selectedItems =
-              box.values.where((item) => item.isSelected).toList();
+          final selectedItems = box.values.where((e) => e.isSelected).toList();
 
           if (selectedItems.isEmpty) {
             return Center(child: Text("No items selected"));
@@ -24,16 +23,14 @@ class SelectedSheet extends StatelessWidget {
             itemBuilder: (_, index) {
               final item = selectedItems[index];
 
-              return Card(
-                child: ListTile(
-                  title: Text(item.name),
-                  trailing: IconButton(
-                    icon: Icon(Icons.remove_circle),
-                    onPressed: () {
-                      item.isSelected = false;
-                      item.save();
-                    },
-                  ),
+              return ListTile(
+                title: Text(item.name),
+                trailing: IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    item.isSelected = false;
+                    item.save();
+                  },
                 ),
               );
             },

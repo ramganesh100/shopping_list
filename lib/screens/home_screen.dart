@@ -11,7 +11,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   late Box<Item> box;
 
-  final List<String> groups = ["Kitchen", "Bathroom", "Cleaning", "Other"];
+  final List<String> groups = [
+    "Kitchen",
+    "Bathroom",
+    "Cleaning",
+    "Medicine",
+    "Other"
+  ];
 
   @override
   void initState() {
@@ -20,51 +26,35 @@ class _HomeScreenState extends State<HomeScreen> {
     seedDefaultItems();
   }
 
-  // 🔥 Default items (close to 100 total)
   void seedDefaultItems() {
     if (box.isNotEmpty) return;
 
     final data = {
       "Kitchen": [
         "Rice",
-        "Wheat Flour",
+        "Flour",
         "Sugar",
         "Salt",
         "Oil",
-        "Turmeric",
-        "Chili Powder",
-        "Cumin",
-        "Mustard Seeds",
         "Tea",
         "Coffee",
         "Milk",
-        "Ghee",
-        "Butter",
         "Onion",
         "Potato",
         "Garlic",
         "Ginger",
         "Tomato",
-        "Green Chili",
-        "Paneer",
-        "Curd",
-        "Lentils",
-        "Beans",
-        "Peas"
+        "Spices"
       ],
       "Bathroom": [
         "Soap",
         "Shampoo",
         "Toothpaste",
         "Toothbrush",
-        "Facewash",
-        "Comb",
-        "Hair Oil",
         "Towel",
-        "Razor",
-        "Shaving Cream",
         "Bucket",
-        "Mug"
+        "Mug",
+        "Comb"
       ],
       "Cleaning": [
         "Detergent",
@@ -73,21 +63,15 @@ class _HomeScreenState extends State<HomeScreen> {
         "Floor Cleaner",
         "Broom",
         "Mop",
-        "Dust Cloth",
-        "Trash Bags",
-        "Phenyl",
-        "Glass Cleaner"
+        "Cloth"
       ],
       "Other": [
         "Notebook",
         "Pen",
-        "Batteries",
+        "Battery",
         "Charger",
-        "Extension Board",
-        "Light Bulb",
         "Umbrella",
-        "Matches",
-        "Candles",
+        "Candle",
         "Tape"
       ]
     };
@@ -99,11 +83,10 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
-  // ➕ Add item
   void addItem(String group) {
-    if (box.length >= 100) {
+    if (box.length >= 500) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Limit reached (100 items)")),
+        SnackBar(content: Text("Max 500 items reached")),
       );
       return;
     }
@@ -112,40 +95,38 @@ class _HomeScreenState extends State<HomeScreen> {
 
     showDialog(
       context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: Text("Add to $group"),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: "Item name"),
+      builder: (_) => AlertDialog(
+        title: Text("Add to $group"),
+        content: TextField(
+          controller: controller,
+          decoration: InputDecoration(hintText: "Item name"),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text("Cancel"),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text("Cancel"),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (controller.text.trim().isNotEmpty) {
-                  box.add(Item(
-                    name: controller.text.trim(),
-                    group: group,
-                  ));
-                }
-                Navigator.pop(context);
-              },
-              child: Text("Add"),
-            ),
-          ],
-        );
-      },
+          ElevatedButton(
+            onPressed: () {
+              if (controller.text.trim().isNotEmpty) {
+                box.add(Item(
+                  name: controller.text.trim(),
+                  group: group,
+                ));
+              }
+              Navigator.pop(context);
+            },
+            child: Text("Add"),
+          ),
+        ],
+      ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Grouped Item Selector")),
+      appBar: AppBar(title: Text("Grouped Items")),
       body: ValueListenableBuilder(
         valueListenable: box.listenable(),
         builder: (context, Box<Item> box, _) {
@@ -170,8 +151,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           item.save();
                         },
                       )),
-
-                  // ➕ Add button per group
                   TextButton.icon(
                     onPressed: () => addItem(group),
                     icon: Icon(Icons.add),

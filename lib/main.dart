@@ -7,12 +7,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter();
-
-  // 🔗 Register adapter
   Hive.registerAdapter(ItemAdapter());
 
-  // 📦 Open box
-  await Hive.openBox<Item>('itemsBox');
+  var box = await Hive.openBox<Item>('itemsBox');
+
+  // 🔥 IMPORTANT: clear old data once (prevents crash)
 
   runApp(MyApp());
 }
@@ -22,15 +21,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-
-      // 🎨 Theme (fixed version)
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.deepPurple,
+        colorScheme: ColorScheme(
+          brightness: Brightness.light,
+          primary: Colors.blue,
+          onPrimary: Colors.white,
+          secondary: Colors.orange,
+          onSecondary: Colors.white,
+          error: Colors.red,
+          onError: Colors.white,
+          surface: Colors.white,
+          onSurface: Colors.black,
         ),
         useMaterial3: true,
       ),
-
       home: HomeScreen(),
     );
   }
